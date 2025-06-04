@@ -26,23 +26,40 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y wget unzip
-
+      
           # Chrome kur
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
-
-          # Chrome major sürümünü al
+      
+          # Chrome sürümünü al
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
           CHROME_MAJOR=$(echo $CHROME_VERSION | cut -d. -f1)
-
-          # ChromeDriver sürümünü al
+      
+          echo "Chrome major sürüm: $CHROME_MAJOR"
+      
+          # Uyumlu ChromeDriver sürümünü al
           DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR")
-
-          # ChromeDriver indir ve kur
+      
+          if [ -z "$DRIVER_VERSION" ]; then
+            echo "ChromeDriver sürümü alınamadı!"
+            exit 1
+          fi
+      
+          echo "İndirilecek ChromeDriver sürümü: $DRIVER_VERSION"
+      
+          # ChromeDriver indir
           wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
-          unzip /tmp/chromedriver.zip -d /tmp/
+      
+          if [ ! -f /tmp/chromedriver.zip ]; then
+            echo "ChromeDriver ZIP bulunamadı!"
+            exit 1
+          fi
+      
+          unzip /tmp/chromedriver.zip -d /tmp/ || { echo "ZIP açma hatası"; exit 1; }
+      
           sudo mv /tmp/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
+
 
       - name: Bot'u çalıştır
         env:
