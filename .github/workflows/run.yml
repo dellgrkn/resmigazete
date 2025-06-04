@@ -22,22 +22,7 @@ jobs:
         run: |
           pip install selenium beautifulsoup4 requests
 
-      - name: Chrome 136 ve uyumlu ChromeDriver kurulumu
-        run: |
-          sudo apt update
-          sudo apt install -y wget unzip
-      
-          # Chrome 136 indir
-          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_136.0.7132.56-1_amd64.deb
-          sudo apt install -y ./google-chrome-stable_136.0.7132.56-1_amd64.deb
-      
-          # ChromeDriver 136 indir
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/136.0.7132.56/chromedriver_linux64.zip"
-          unzip /tmp/chromedriver.zip -d /tmp/
-          sudo mv /tmp/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
-
+     
       - name: Bot'u çalıştır
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
