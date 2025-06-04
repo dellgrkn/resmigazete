@@ -2,7 +2,7 @@ name: Run Resmi Gazete Bot
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # 03:00 UTC = 06:00 Türkiye
+    - cron: '0 3 * * *'  # Türkiye saatiyle 06:00 (UTC 03:00)
   workflow_dispatch:
 
 jobs:
@@ -18,18 +18,28 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Paketleri yükle
+      - name: Python kütüphanelerini yükle
         run: |
           pip install selenium beautifulsoup4 requests
 
-      - name: Chrome ve WebDriver kur
+      - name: Google Chrome ve uyumlu ChromeDriver kurulumu
         run: |
           sudo apt update
           sudo apt install -y wget unzip
+
+          # Chrome kur
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_VERSION}/chromedriver_linux64.zip" || true
+
+          # Chrome major sürümünü al
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+          CHROME_MAJOR=$(echo $CHROME_VERSION | cut -d. -f1)
+
+          # ChromeDriver sürümünü al
+          DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJOR")
+
+          # ChromeDriver indir ve kur
+          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
           unzip /tmp/chromedriver.zip -d /tmp/
           sudo mv /tmp/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
